@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NeoShop - E-Commerce</title>
+
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+
+/* Custom Scrollbar */
+::-webkit-scrollbar{
+width:6px;
+}
+::-webkit-scrollbar-thumb{
+background:#00f2ff;
+border-radius:10px;
+}
+
+/* Neon Button */
+.neon-btn{
+background:#00e5ff;
+color:black;
+padding:10px 20px;
+border-radius:8px;
+font-weight:bold;
+transition:0.3s;
+}
+
+.neon-btn:hover{
+background:#00bcd4;
+transform:scale(1.05);
+}
+
+</style>
+</head>
+
+<body class="bg-gray-900 text-white">
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="bg-black p-4 flex justify-between items-center">
+
+<h1 class="text-2xl font-bold text-cyan-400">
+NeoShop
+</h1>
+
+<div class="space-x-6 hidden md:block">
+
+<a href="#" class="hover:text-cyan-400">Home</a>
+
+<a href="#products" class="hover:text-cyan-400">Products</a>
+
+<a href="#" onclick="openLogin()" class="hover:text-cyan-400">Login</a>
+
+<button onclick="toggleCart()" class="neon-btn">
+Cart (<span id="cart-count">0</span>)
+</button>
+
+</div>
+
+</nav>
+
+<!-- ================= HERO SECTION ================= -->
+
+<section class="text-center py-20">
+
+<h1 class="text-5xl font-bold mb-6">
+Next Generation Shopping
+</h1>
+
+<p class="text-gray-400 mb-6">
+Premium sneakers, fashion and tech products.
+</p>
+
+<button class="neon-btn">
+Shop Now
+</button>
+
+</section>
+
+<!-- ================= PRODUCT SECTION ================= -->
+
+<section id="products" class="p-10 grid md:grid-cols-3 gap-8">
+
+</section>
+
+<!-- ================= CART DRAWER ================= -->
+
+<div id="cart" class="fixed right-0 top-0 h-full w-80 bg-black p-6 transform translate-x-full transition duration-300">
+
+<h2 class="text-xl mb-4">Your Cart</h2>
+
+<div id="cart-items"></div>
+
+<div class="mt-4">
+
+<p class="mb-2">
+Total: ₹<span id="cart-total">0</span>
+</p>
+
+<button onclick="checkout()" class="neon-btn w-full">
+Checkout
+</button>
+
+</div>
+
+</div>
+
+<!-- ================= LOGIN MODAL ================= -->
+
+<div id="loginModal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center">
+
+<div class="bg-gray-800 p-8 rounded-lg w-80">
+
+<h2 class="text-xl mb-4">Login</h2>
+
+<input id="email" type="email" placeholder="Email" class="w-full p-2 mb-3 text-black">
+
+<input id="password" type="password" placeholder="Password" class="w-full p-2 mb-3 text-black">
+
+<button onclick="login()" class="neon-btn w-full">
+Login
+</button>
+
+</div>
+
+</div>
+
+<!-- ================= FOOTER ================= -->
+
+<footer class="bg-black text-center p-6 mt-20">
+
+<p>
+© 2026 NeoShop. All Rights Reserved.
+</p>
+
+<div class="space-x-4 mt-2">
+
+<a href="#">Instagram</a>
+<a href="#">Twitter</a>
+<a href="#">YouTube</a>
+
+</div>
+
+</footer>
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script>
+
+/* ================= PRODUCT DATABASE ================= */
+
+const products = [
+
+{
+id:1,
+name:"Nike Air Max",
+price:4999,
+image:"https://images.unsplash.com/photo-1542291026-7eec264c27ff"
+},
+
+{
+id:2,
+name:"Adidas Sneakers",
+price:3999,
+image:"https://images.unsplash.com/photo-1600185365483-26d7a4cc7519"
+},
+
+{
+id:3,
+name:"Puma Runner",
+price:2999,
+image:"https://images.unsplash.com/photo-1528701800489-20be3c79c2f9"
+}
+
+]
+
+let cart = JSON.parse(localStorage.getItem("cart")) || []
+
+/* ================= LOAD PRODUCTS ================= */
+
+function loadProducts(){
+
+const container = document.getElementById("products")
+
+container.innerHTML=""
+
+products.forEach(product=>{
+
+container.innerHTML+=`
+
+<div class="bg-gray-800 p-4 rounded-lg">
+
+<img src="${product.image}" class="h-48 w-full object-cover rounded">
+
+<h3 class="mt-4 text-lg">${product.name}</h3>
+
+<p class="text-cyan-400">₹${product.price}</p>
+
+<button onclick="addToCart(${product.id})" class="neon-btn mt-2">
+Add To Cart
+</button>
+
+</div>
+
+`
+
+})
+
+}
+
+/* ================= ADD TO CART ================= */
+
+function addToCart(id){
+
+const product = products.find(p=>p.id===id)
+
+cart.push(product)
+
+localStorage.setItem("cart",JSON.stringify(cart))
+
+updateCart()
+
+}
+
+/* ================= UPDATE CART ================= */
+
+function updateCart(){
+
+document.getElementById("cart-count").innerText = cart.length
+
+let itemsHTML=""
+
+let total=0
+
+cart.forEach(item=>{
+
+itemsHTML+=`
+
+<div class="border-b border-gray-700 py-2">
+
+${item.name} - ₹${item.price}
+
+</div>
+
+`
+
+total+=item.price
+
+})
+
+document.getElementById("cart-items").innerHTML = itemsHTML
+
+document.getElementById("cart-total").innerText = total
+
+}
+
+/* ================= CART TOGGLE ================= */
+
+function toggleCart(){
+
+const cartDrawer = document.getElementById("cart")
+
+cartDrawer.classList.toggle("translate-x-full")
+
+}
+
+/* ================= LOGIN ================= */
+
+function openLogin(){
+
+document.getElementById("loginModal").classList.remove("hidden")
+
+}
+
+function login(){
+
+const email=document.getElementById("email").value
+
+localStorage.setItem("user",email)
+
+alert("Login Successful")
+
+document.getElementById("loginModal").classList.add("hidden")
+
+}
+
+/* ================= CHECKOUT ================= */
+
+function checkout(){
+
+if(cart.length==0){
+
+alert("Cart Empty")
+
+return
+
+}
+
+alert("Payment Successful (Demo)")
+
+cart=[]
+
+localStorage.removeItem("cart")
+
+updateCart()
+
+}
+
+/* ================= INIT ================= */
+
+loadProducts()
+
+updateCart()
+
+</script>
+
+</body>
+</html>
